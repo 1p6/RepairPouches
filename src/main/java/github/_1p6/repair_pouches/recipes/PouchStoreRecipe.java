@@ -57,7 +57,7 @@ public class PouchStoreRecipe extends CustomRecipe {
 				item.setTier(pouch, item.getTierForMaterial(mats.get(0)));
 			for (ItemStack mat : mats) {
 				Tier matT = item.getTierForMaterial(mat);
-				int amount = matT.getUses();
+				int amount = matT.getUses()/4;
 				item.setStoredDurability(pouch, Util.saturatingAdd(amount, item.getStoredDurability(pouch)));
 				if (matT.getUses() >= item.getTierUses(pouch))
 					item.setStoredSharpness(pouch, Util.saturatingMul(
@@ -101,7 +101,7 @@ public class PouchStoreRecipe extends CustomRecipe {
 			pouch = pouch.copy();
 			for (ItemStack mat : mats) {
 				Tier matT = item.getTierForMaterial(mat);
-				int amount = matT.getUses();
+				int amount = matT.getUses()/4;
 				item.setStoredDurability(pouch, Util.saturatingAdd(amount, item.getStoredDurability(pouch)));
 				if (matT.getUses() >= item.getTierUses(pouch))
 					item.setStoredSharpness(pouch, Util.saturatingMul(

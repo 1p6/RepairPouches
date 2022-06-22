@@ -7,13 +7,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.TieredItem;
-import net.minecraft.world.item.Tiers;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.TierSortingRegistry;
@@ -52,10 +50,13 @@ public class RepairPouch extends Item {
 		Item toolItem = tool.getItem();
 		if(!toolItem.isRepairable(tool)) return null;
 		if(toolItem instanceof TieredItem) return ((TieredItem) toolItem).getTier();
-		try {
-			return getTierForMaterial(((ArmorItem) toolItem).getMaterial().getRepairIngredient().getItems()[0]);
-		} catch(Throwable t) {}
-		return Tiers.WOOD;
+		for(Tier t : TierSortingRegistry.getSortedTiers()) {
+			try {
+				if(toolItem.isValidRepairItem(tool, t.getRepairIngredient().getItems()[0]))
+					return t;
+			} catch(Throwable t2) {}
+		}
+		return null;
 	}
 	
 	@Override
@@ -78,7 +79,11 @@ public class RepairPouch extends Item {
 	
 	@Override
 	public void appendHoverText(ItemStack st, Level p_41422_, List<Component> texts, TooltipFlag p_41424_) {
-		texts.add(new TextComponent(getStoredDurability(st) + " / " + getStoredSharpness(st)));
+		int tierUses = getTierUses(st);
+		String descId = getDescriptionId();
+		texts.add(tierUses == 0 ? new TranslatableComponent(descId + ".stats.no_tier") :
+			new TranslatableComponent(descId + ".stats",
+					getStoredDurability(st)/tierUses, getStoredSharpness(st)/tierUses));
 	}
 	
 	public int getStoredDurability(ItemStack item) {

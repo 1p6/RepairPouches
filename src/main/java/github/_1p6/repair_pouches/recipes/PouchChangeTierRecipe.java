@@ -28,15 +28,15 @@ public class PouchChangeTierRecipe extends UpgradeRecipe {
 		RepairPouch item = (RepairPouch) pouch.getItem();
 		Tier newTier = item.getTierForMaterial(mat);
 		pouch = pouch.copy();
+		int amount = newTier.getUses()/4;
 		if(newTier.getUses() > item.getTierUses(pouch))
 			item.setStoredSharpness(pouch, Util.saturatingMul(
-					newTier.getUses(),
-					item.SHARPNESS_BONUS_PERCENT)/100);
+					amount, item.SHARPNESS_BONUS_PERCENT)/100);
 		else
 			item.setStoredSharpness(pouch, Util.saturatingMul(
-					Util.saturatingAdd(newTier.getUses(), item.getStoredSharpness(pouch)),
+					Util.saturatingAdd(amount, item.getStoredSharpness(pouch)),
 					item.SHARPNESS_BONUS_PERCENT)/100);
-		item.setStoredDurability(pouch, Util.saturatingAdd(newTier.getUses(), item.getStoredDurability(pouch)));
+		item.setStoredDurability(pouch, Util.saturatingAdd(amount, item.getStoredDurability(pouch)));
 		item.setTier(pouch, newTier);
 		return pouch;
 	}

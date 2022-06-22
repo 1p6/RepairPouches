@@ -1,5 +1,7 @@
 {
   "item.repair_pouches.repair_pouch": "%s Repair Pouch",
   "item.repair_pouches.repair_pouch.no_tier": "Empty",
+  "item.repair_pouches.repair_pouch.stats": "%s / %s",
+  "item.repair_pouches.repair_pouch.stats.no_tier": "? / ?",
   "item.repair_pouches.repair_pouch.info": "Craft with repair materials (such as iron ingots) to add durability, craft with a tool to repair the tool, or craft in a smithing table with a repair material to change tiers."
 }
