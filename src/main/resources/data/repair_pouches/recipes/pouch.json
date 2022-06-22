@@ -1,0 +1,17 @@
+{
+  "type": "repair_pouches:pouch",
+  "pattern": [
+    "///",
+    "/ /",
+    "///"
+  ],
+  "swordSlot": 4,
+  "key": {
+    "/": {
+      "tag": "forge:rods/wooden"
+    }
+  },
+  "result": {
+    "item": "repair_pouches:repair_pouch"
+  }
+}
