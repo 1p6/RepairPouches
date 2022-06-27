@@ -20,21 +20,27 @@ public class PouchStoreRecipe extends CustomRecipe {
 
 	@Override
 	public boolean matches(CraftingContainer c, Level p_44003_) {
-		boolean hasPouch = false;
+		ItemStack pouch = null;
+		int pouchId = -1;
+		for(int i = 0; i < c.getContainerSize(); i++) {
+			ItemStack st = c.getItem(i);
+			if(st.getItem() instanceof RepairPouch) {
+				pouch = st;
+				pouchId = i;
+				break;
+			}
+		}
+		if(pouch == null) return false;
+		RepairPouch item = ((RepairPouch) pouch.getItem());
 		boolean hasMats = false;
 		for(int i = 0; i < c.getContainerSize(); i++) {
 			ItemStack st = c.getItem(i);
-			if(st.isEmpty()) continue;
-			if(st.getItem() instanceof RepairPouch) {
-				if(hasPouch) return false;
-				hasPouch = true;
-			} else if(RepairPouch.ITEM.getTierForMaterial(st) != null) {
-				hasMats = true;
-			} else {
+			if(i == pouchId || st.isEmpty()) continue;
+			if(item.getTierForMaterial(st) == null)
 				return false;
-			}
+			hasMats = true;
 		}
-		return hasPouch && hasMats;
+		return hasMats;
 	}
 
 	@Override
@@ -51,20 +57,7 @@ public class PouchStoreRecipe extends CustomRecipe {
 			}
 		}
 		if(mats.size() == 1) {
-			RepairPouch item = (RepairPouch) pouch.getItem();
-			pouch = pouch.copy();
-			if(item.getTier(pouch) == null)
-				item.setTier(pouch, item.getTierForMaterial(mats.get(0)));
-			for (ItemStack mat : mats) {
-				Tier matT = item.getTierForMaterial(mat);
-				int amount = matT.getUses()/4;
-				item.setStoredDurability(pouch, Util.saturatingAdd(amount, item.getStoredDurability(pouch)));
-				if (matT.getUses() >= item.getTierUses(pouch))
-					item.setStoredSharpness(pouch, Util.saturatingMul(
-							Util.saturatingAdd(amount, item.getStoredSharpness(pouch)),
-							item.SHARPNESS_BONUS_PERCENT)/100);
-			}
-			return pouch;
+			return updatePouch(pouch, mats.get(0), mats);
 		} else {
 			ItemStack mat = mats.get(0).copy();
 			mat.setCount(1);
@@ -79,7 +72,6 @@ public class PouchStoreRecipe extends CustomRecipe {
 		int pouchIndex = 0;
 		List<ItemStack> mats = new ArrayList<>();
 		ItemStack initMat = null;
-		boolean skipped = false;
 		for(int i = 0; i < c.getContainerSize(); i++) {
 			ItemStack st = c.getItem(i);
 			if(st.isEmpty()) continue;
@@ -87,30 +79,31 @@ public class PouchStoreRecipe extends CustomRecipe {
 				pouch = st;
 				pouchIndex = i;
 			} else {
-				if(skipped) mats.add(st);
-				else {
-					initMat = st;
-					skipped = true;
-				}
+				if(initMat != null) mats.add(st);
+				else initMat = st;
 			}
 		}
+		if(!mats.isEmpty()) {
+			res.set(pouchIndex, updatePouch(pouch, initMat, mats));
+		}
+		return res;
+	}
+	
+	public ItemStack updatePouch(ItemStack pouch, ItemStack initMat, List<ItemStack> mats) {
+		pouch = pouch.copy();
 		RepairPouch item = (RepairPouch) pouch.getItem();
 		if(item.getTier(pouch) == null)
 			item.setTier(pouch, item.getTierForMaterial(initMat));
-		if(!mats.isEmpty()) {
-			pouch = pouch.copy();
-			for (ItemStack mat : mats) {
-				Tier matT = item.getTierForMaterial(mat);
-				int amount = matT.getUses()/4;
-				item.setStoredDurability(pouch, Util.saturatingAdd(amount, item.getStoredDurability(pouch)));
-				if (matT.getUses() >= item.getTierUses(pouch))
-					item.setStoredSharpness(pouch, Util.saturatingMul(
-							Util.saturatingAdd(amount, item.getStoredSharpness(pouch)),
-							item.SHARPNESS_BONUS_PERCENT)/100);
-			}
-			res.set(pouchIndex, pouch);
+		for (ItemStack mat : mats) {
+			Tier matT = item.getTierForMaterial(mat);
+			int amount = matT.getUses()/4;
+			item.setStoredDurability(pouch, Util.saturatingAdd(amount, item.getStoredDurability(pouch)));
+			if (matT.getUses() >= item.getTierUses(pouch))
+				item.setStoredSharpness(pouch, Util.saturatingMul(
+						Util.saturatingAdd(amount, item.getStoredSharpness(pouch)),
+						item.SHARPNESS_BONUS_PERCENT)/100);
 		}
-		return res;
+		return pouch;
 	}
 
 	@Override

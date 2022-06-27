@@ -34,7 +34,8 @@ public class PouchRecipe extends ShapedRecipe {
 		
 		@SuppressWarnings("deprecation")
 		Ingredient sword = Ingredient.of(Registry.ITEM.stream().parallel()
-				.filter(item -> item instanceof SwordItem).map(Item::getDefaultInstance).filter(ItemStack::isRepairable));
+				.filter(item -> item instanceof SwordItem && ((SwordItem) item).getTier() != null)
+				.map(Item::getDefaultInstance));
 		igs.set(swordSlot, sword);
 	}
 	
@@ -43,7 +44,7 @@ public class PouchRecipe extends ShapedRecipe {
 		ItemStack res =  super.assemble(c);
 		RepairPouch item = (RepairPouch) res.getItem();
 		ItemStack sword = c.getItem(swordSlot);
-		Tier t = item.getToolTier(sword);
+		Tier t = ((SwordItem) sword.getItem()).getTier();
 		int amount = t.getUses() - sword.getDamageValue();
 		item.setTier(res, t);
 		item.setStoredDurability(res, amount);

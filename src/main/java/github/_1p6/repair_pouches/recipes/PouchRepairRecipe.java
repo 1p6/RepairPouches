@@ -26,13 +26,14 @@ public class PouchRepairRecipe extends CustomRecipe {
 			if(st.getItem() instanceof RepairPouch) {
 				if(pouch != null) return false;
 				else pouch = st;
-			} else if(RepairPouch.ITEM.getToolTier(st) != null) {
+			} else {
 				if(tool != null) return false;
 				else tool = st;
-			} else return false;
+			}
 		}
 		if(pouch == null || tool == null) return false;
 		RepairPouch item = (RepairPouch) pouch.getItem();
+		if(item.getToolTier(tool) == null) return false;
 		int dmg = tool.getDamageValue();
 		int dur = item.getStoredDurability(pouch);
 		int sharp = item.getStoredSharpness(pouch);

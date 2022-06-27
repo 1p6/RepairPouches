@@ -5,6 +5,7 @@ import github._1p6.repair_pouches.Util;
 import github._1p6.repair_pouches.items.RepairPouch;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -17,8 +18,9 @@ public class PouchChangeTierRecipe extends UpgradeRecipe {
 
 	@Override
 	public boolean matches(Container c, Level p_44003_) {
-		return c.getItem(0).getItem() instanceof RepairPouch &&
-				RepairPouch.ITEM.getTierForMaterial(c.getItem(1)) != null;
+		Item item = c.getItem(0).getItem();
+		return item instanceof RepairPouch &&
+				((RepairPouch) item).getTierForMaterial(c.getItem(1)) != null;
 	}
 
 	@Override

@@ -49,7 +49,10 @@ public class RepairPouch extends Item {
 		if(tool.isEmpty()) return null;
 		Item toolItem = tool.getItem();
 		if(!toolItem.isRepairable(tool)) return null;
-		if(toolItem instanceof TieredItem) return ((TieredItem) toolItem).getTier();
+		if(toolItem instanceof TieredItem) {
+			Tier t = ((TieredItem) toolItem).getTier();
+			if(t != null) return t;
+		}
 		for(Tier t : TierSortingRegistry.getSortedTiers()) {
 			try {
 				if(toolItem.isValidRepairItem(tool, t.getRepairIngredient().getItems()[0]))
@@ -95,11 +98,11 @@ public class RepairPouch extends Item {
 	}
 	
 	public void setStoredDurability(ItemStack item, int d) {
-		item.getOrCreateTag().putInt(NBT_DURABILITY, d);
+		item.getOrCreateTag().putInt(NBT_DURABILITY, Math.max(0, d));
 	}
 	
 	public void setStoredSharpness(ItemStack item, int s) {
-		item.getOrCreateTag().putInt(NBT_SHARPNESS, s);
+		item.getOrCreateTag().putInt(NBT_SHARPNESS, Math.max(0, s));
 	}
 	
 	public Tier getTier(ItemStack item) {
